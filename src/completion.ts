@@ -1,5 +1,5 @@
 import type * as lsp from "vscode-languageserver-protocol"
-import {EditorState, Extension} from "@codemirror/state"
+import {EditorState, Extension, Facet} from "@codemirror/state"
 import {CompletionSource, Completion, CompletionContext, snippet, autocompletion} from "@codemirror/autocomplete"
 import {LSPPlugin} from "./plugin"
 
@@ -12,14 +12,27 @@ export function serverCompletion(config: {
   /// other sources. Set this to true to make it replace all
   /// completion sources.
   override?: boolean
+  /// Set a custom
+  /// [`validFor`](#autocomplete.CompletionResult.validFor) expression
+  /// to use in the completion results. By default, the library uses an
+  /// expression that accepts word characters, optionally prefixed by
+  /// any non-word prefixes found in the results.
+  validFor?: RegExp
 } = {}): Extension {
+  let result: Extension[]
   if (config.override) {
-    return autocompletion({override: [serverCompletionSource]})
+    result = [autocompletion({override: [serverCompletionSource]})]
   } else {
     let data = [{autocomplete: serverCompletionSource}]
-    return [autocompletion(), EditorState.languageData.of(() => data)]
+    result = [autocompletion(), EditorState.languageData.of(() => data)]
   }
+  if (config.validFor) result.push(completionConfig.of({validFor: config.validFor}))
+  return result
 }
+
+const completionConfig = Facet.define<{validFor: RegExp}, {validFor: RegExp | null}>({
+  combine: results => results.length ? results[0] : {validFor: null}
+})
 
 function getCompletions(plugin: LSPPlugin, pos: number, context: lsp.CompletionContext, abort?: CompletionContext) {
   if (plugin.client.hasCapability("completionProvider") === false) return Promise.resolve(null)
@@ -68,6 +81,7 @@ export const serverCompletionSource: CompletionSource = context => {
     if (Array.isArray(result)) result = {items: result} as lsp.CompletionList
     let {from, to} = completionResultRange(context, result)
     let defaultCommitChars = result.itemDefaults?.commitCharacters
+    let config = context.state.facet(completionConfig)
 
     return {
       from, to,
@@ -88,7 +102,7 @@ export const serverCompletionSource: CompletionSource = context => {
         return option
       }),
       commitCharacters: defaultCommitChars,
-      validFor: prefixRegexp(result.items),
+      validFor: config.validFor ?? prefixRegexp(result.items),
       map: (result, changes) => ({...result, from: changes.mapPos(result.from)}),
     }
   }, err => {
