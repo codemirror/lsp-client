@@ -1,3 +1,9 @@
+## 6.2.0 (2025-10-27)
+
+### New features
+
+`serverCompletion` now takes an option `validFor` that can be used to configure the regexp used in the result.
+
 ## 6.1.2 (2025-09-10)
 
 ### Bug fixes
