@@ -1,3 +1,9 @@
+## 6.2.1 (2025-11-20)
+
+### Bug fixes
+
+Support `sortText` properties on LSP completions.
+
 ## 6.2.0 (2025-10-27)
 
 ### New features
