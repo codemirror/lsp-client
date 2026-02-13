@@ -96,7 +96,7 @@ export const serverCompletionSource: CompletionSource = context => {
         if (item.detail) option.detail = item.detail
         if (item.sortText) option.sortText = item.sortText
         if (item.insertTextFormat == 2 /* Snippet */) {
-          option.apply = (view, c, from, to) => snippet(text)(view, c, from, to)
+          option.apply = (view, c, from, to) => snippet(text.replace(/\$(\d+)/g, "${$1}"))(view, c, from, to)
           option.label = item.label
         }
         if (item.documentation) option.info = () => renderDocInfo(plugin, item.documentation!)
