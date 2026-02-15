@@ -35,8 +35,9 @@ function jumpToOrigin(view: EditorView, type: {get: typeof getDefinition, capabi
   if (!plugin || plugin.client.hasCapability(type.capability) === false) return false
   plugin.client.sync()
   plugin.client.withMapping(mapping => type.get(plugin, view.state.selection.main.head).then(response => {
-    if (!response) return
     let loc = Array.isArray(response) ? response[0] : response
+    if(!loc) return;
+
     return (loc.uri == plugin.uri ? Promise.resolve(view) : plugin.client.workspace.displayFile(loc.uri)).then(target => {
       if (!target) return
       let pos = mapping.getMapping(loc.uri) ? mapping.mapPosition(loc.uri, loc.range.start)
