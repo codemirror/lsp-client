@@ -61,7 +61,6 @@ const clientCapabilities: lsp.ClientCapabilities = {
     implementation: {},
     typeDefinition: {},
     references: {},
-    diagnostic: {},
   },
   window: {
     showMessage: {}
