@@ -428,7 +428,7 @@ export class LSPClient {
   /// (which is compared by identity).
   cancelRequest(params: any) {
     let found = this.requests.find(r => r.params === params)
-    if (found) this.notification("$/cancelRequest", found.id)
+    if (found) this.notification("$/cancelRequest", {id: found.id})
   }
 
   /// @internal
