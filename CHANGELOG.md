@@ -1,3 +1,9 @@
+## 6.2.2 (2026-03-02)
+
+### Bug fixes
+
+In completion snippets from the server, treat `$1` the same as `${1}`.
+
 ## 6.2.1 (2025-11-20)
 
 ### Bug fixes
