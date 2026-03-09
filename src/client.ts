@@ -1,5 +1,6 @@
 import type * as lsp from "vscode-languageserver-protocol"
-import {showDialog} from "@codemirror/view"
+import {SemanticTokenTypes, SemanticTokenModifiers} from "vscode-languageserver-protocol"
+import {Decoration, showDialog} from "@codemirror/view"
 import {ChangeSet, ChangeDesc, MapMode, Text, Extension} from "@codemirror/state"
 import {Language} from "@codemirror/language"
 import {LSPPlugin, lspPlugin} from "./plugin"
@@ -62,6 +63,16 @@ const clientCapabilities: lsp.ClientCapabilities = {
     typeDefinition: {},
     references: {},
     diagnostic: {},
+    semanticTokens: {
+      requests: {
+        full: true,
+        range: true,
+      },
+      tokenTypes: Object.values(SemanticTokenTypes),
+      tokenModifiers: Object.values(SemanticTokenModifiers),
+      formats: ["relative"],
+      overlappingTokenSupport: true,
+    }
   },
   window: {
     showMessage: {}
@@ -187,6 +198,16 @@ export type LSPClientConfig = {
   /// function here that returns a CodeMirror language object for a
   /// given language tag to support more languages.
   highlightLanguage?: (name: string) => Language | null
+  /// A callback to opt into highlighting code using 
+  /// `textDocument/semanticTokens` requests. Will be called for every
+  /// token to decide how exactly it should be highlighted.
+  highlightSemanticTokens?: (
+    plugin: LSPPlugin,
+    from: number,
+    to: number,
+    tokenType: SemanticTokenTypes | string,
+    tokenModifiers: (SemanticTokenModifiers | string)[],
+  ) => Decoration
   /// By default, the client will only handle the server notifications
   /// `window/logMessage` (logging warnings and errors to the console)
   /// and `window/showMessage`. You can pass additional handlers here.

@@ -9,6 +9,7 @@ export {signatureHelp, nextSignature, prevSignature, showSignatureHelp, signatur
 export {jumpToDefinition, jumpToDeclaration, jumpToTypeDefinition, jumpToImplementation, jumpToDefinitionKeymap} from "./definition"
 export {findReferences, closeReferencePanel, findReferencesKeymap} from "./references"
 export {serverDiagnostics} from "./diagnostics"
+export {semanticTokens} from "./semanticTokens"
 
 import {Extension} from "@codemirror/state"
 import {keymap} from "@codemirror/view"
@@ -22,6 +23,7 @@ import {signatureHelp} from "./signature"
 import {jumpToDefinitionKeymap} from "./definition"
 import {findReferencesKeymap} from "./references"
 import {serverDiagnostics} from "./diagnostics"
+import {semanticTokens} from "./semanticTokens"
 
 /// Returns an extension that enables the [LSP
 /// plugin](#lsp-client.LSPPlugin) as well as LSP based
@@ -40,6 +42,7 @@ export function languageServerSupport(client: LSPClient, uri: string, languageID
     hoverTooltips(),
     keymap.of([...formatKeymap, ...renameKeymap, ...jumpToDefinitionKeymap, ...findReferencesKeymap]),
     signatureHelp(),
+    semanticTokens(),
   ]
 }
 
@@ -53,6 +56,7 @@ export function languageServerExtensions(): readonly (Extension | LSPClientExten
     hoverTooltips(),
     keymap.of([...formatKeymap, ...renameKeymap, ...jumpToDefinitionKeymap, ...findReferencesKeymap]),
     signatureHelp(),
-    serverDiagnostics()
+    serverDiagnostics(),
+    semanticTokens(),
   ]
 }
